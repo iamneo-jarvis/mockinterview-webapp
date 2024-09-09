@@ -1,0 +1,11 @@
+<div>
+    <input [(ngModel)]="roomId" placeholder="Enter Room ID" />
+    <button (click)="startCall()">Start Call</button>
+  
+    <h3>Local Video</h3>
+    <video #localVideo autoplay></video>
+  
+    <h3>Remote Video</h3>
+    <video #remoteVideo autoplay></video>
+</div>
+  
