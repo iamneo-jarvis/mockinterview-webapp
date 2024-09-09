@@ -2,7 +2,8 @@ import { Component, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/
 import { WebSocketService } from '../../services/websocker.service';
 import { FormsModule } from '@angular/forms';  // Import FormsModule
 import { isPlatformBrowser } from '@angular/common';
-
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 declare global {
   interface Window {
     SpeechRecognition: any;
@@ -12,7 +13,7 @@ declare global {
 @Component({
   selector: 'app-interview-module',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, MatButtonModule, MatIconModule],  // Add FormsModule and HttpClientModule to imports
   templateUrl: './interview-module.component.html',
   styleUrls: ['./interview-module.component.less'],
 })
@@ -24,6 +25,8 @@ export class InterviewModuleComponent {
   localStream: MediaStream | undefined;
   remoteStream: MediaStream | undefined;
   recognition: any;  // For speech recognition
+  isMicOn: boolean = true;
+  isCameraOn: boolean = true;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private websocketService: WebSocketService) {
     // Ensure browser-specific code runs only in the browser
@@ -51,7 +54,7 @@ export class InterviewModuleComponent {
       this.recognition.continuous = true;
       this.recognition.interimResults = true;
       this.recognition.lang = 'en-US'; // Set language as needed
-
+      
       // Event for receiving transcriptions
       this.recognition.onresult = (event: any) => {
         let interimTranscript = '';
@@ -70,6 +73,9 @@ export class InterviewModuleComponent {
         // Send the final transcribed text to the backend using WebSocket
         if (finalTranscript) {
           this.websocketService.sendMessage({
+            candidate_id: 'e9c26e9a-adaf-42ef-ae32-35bde7375553',  // Add candidate ID here
+            interview_id: 'e9c26e9a-adaf-42ef-ae32-35bde7378883',
+            room_id: this.roomId,
             type: 'transcription',
             text: finalTranscript
           });
@@ -86,9 +92,8 @@ export class InterviewModuleComponent {
   }
 
   async startCall() {
-    if(!this.isBrowser()) return;
     this.websocketService.connect(this.roomId);
-
+    console.log('Starting call...');
     // Set up the local stream (video/audio)
     this.localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -154,7 +159,17 @@ export class InterviewModuleComponent {
             new RTCSessionDescription(message)
           );
         } else if (message.type === 'candidate') {
-          await this.peerConnection?.addIceCandidate(new RTCIceCandidate(message));
+          const candidate = message.candidate;
+      
+          // Check for valid sdpMid and sdpMLineIndex
+          if (candidate && candidate.sdpMid && candidate.sdpMLineIndex !== null) {
+            await this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
+          } else {
+            console.error('Invalid ICE candidate:', candidate);
+          }
+        }else if (message.type === 'transcription') {
+          // Process transcription data here
+          console.log('Received transcription:', message.text);
         }
       });
     } else {
@@ -168,5 +183,30 @@ export class InterviewModuleComponent {
       type: 'offer',
       sdp: this.peerConnection?.localDescription?.sdp,
     });
+  }
+
+  // End the call
+  endCall() {
+    this.peerConnection?.close();
+    this.websocketService.close();
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => track.stop());
+    }
+  }
+
+  // Toggle microphone
+  toggleMic() {
+    if (this.localStream) {
+      this.isMicOn = !this.isMicOn;
+      this.localStream.getAudioTracks().forEach(track => track.enabled = this.isMicOn);
+    }
+  }
+
+  // Toggle camera
+  toggleCamera() {
+    if (this.localStream) {
+      this.isCameraOn = !this.isCameraOn;
+      this.localStream.getVideoTracks().forEach(track => track.enabled = this.isCameraOn);
+    }
   }
 }

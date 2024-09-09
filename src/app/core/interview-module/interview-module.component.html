@@ -1,11 +1,33 @@
-<div>
-    <input [(ngModel)]="roomId" placeholder="Enter Room ID" />
-    <button (click)="startCall()">Start Call</button>
-  
-    <h3>Local Video</h3>
-    <video #localVideo autoplay></video>
-  
-    <h3>Remote Video</h3>
-    <video #remoteVideo autoplay></video>
+<div class="video-call-container">
+    <!-- Room ID Input -->
+    <input matInput [(ngModel)]="roomId" placeholder="Enter Room ID" />
+
+    <!-- Start Call Button -->
+    <button mat-raised-button color="primary" (click)="startCall()">Start Call</button>
+
+    <!-- Video Elements -->
+    <div class="video-section">
+        <video #localVideo autoplay></video>
+      
+        <h3>Remote Video</h3>
+        <video #remoteVideo autoplay></video>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="controls">
+        <!-- End Call Button -->
+        <button mat-fab color="warn" (click)="endCall()">
+            <mat-icon>call_end</mat-icon>
+        </button>
+      
+        <!-- Mute/Unmute Mic Button -->
+        <button mat-fab color="accent" (click)="toggleMic()">
+            <mat-icon>{{ isMicOn ? 'mic' : 'mic_off' }}</mat-icon>
+        </button>
+
+        <!-- Camera Toggle Button (Optional) -->
+        <button mat-fab color="primary" (click)="toggleCamera()">
+            <mat-icon>{{ isCameraOn ? 'videocam' : 'videocam_off' }}</mat-icon>
+        </button>
+    </div>
 </div>
-  

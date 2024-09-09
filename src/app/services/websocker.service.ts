@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
-
+import { environment } from 'src/environment';
 @Injectable({
   providedIn: 'root',
 })
 export class WebSocketService {
   public socket$: WebSocketSubject<any> | undefined;
-
+  private wsUrl = environment.wsUrl;
   connect(roomId: string): void {
-    this.socket$ = webSocket(`ws://172.28.87.198:8080/ws/${roomId}`);
+    this.socket$ = webSocket(`${this.wsUrl}/${roomId}`);
 
     this.socket$.subscribe({
       next: (message) => console.log('Received message:', message),
