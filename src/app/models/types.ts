@@ -6,3 +6,9 @@ export type actions = {
 export type iconList = {
     isActive?: boolean;
 } & actions
+
+export type zoom_jwt_payload = {
+    interview_id: string;
+    candidate_id: string;
+    candidate_name: string;
+}

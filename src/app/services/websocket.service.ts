@@ -7,9 +7,9 @@ import { environment } from 'src/environment';
 export class WebSocketService {
   public socket$: WebSocketSubject<any> | undefined;
   private wsUrl = environment.wsUrl;
-  connect(roomId: string): void {
+  connect(roomId: number, jwt_token?: string): void {
     this.socket$ = webSocket(`${this.wsUrl}/${roomId}`);
-
+    console.log('WebSocket connection establishing');
     this.socket$.subscribe({
       next: (message) => console.log('Received message:', message),
       error: (err) => console.error('WebSocket error:', err),
@@ -17,7 +17,7 @@ export class WebSocketService {
     });
   }
 
-  sendMessage(message: any): void {
+  sendTranscription(message: any): void {
     if (this.socket$) {
       this.socket$.next(message);
     } else {
@@ -25,7 +25,7 @@ export class WebSocketService {
     }
   }
 
-  close(): void {
+  closeConnection(): void {
     if (this.socket$) {
       this.socket$.complete();
     } else {

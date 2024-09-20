@@ -1,0 +1,17 @@
+<div class="p-grid p-align-center p-justify-center" style="height: 100vh;">
+    <div class="p-col-12 p-md-6">
+        <p-fileUpload
+        name="resume"
+        accept=".pdf,.doc,.docx"
+        maxFileSize="1000000"
+        [customUpload]="true"
+        (uploadHandler)="onUpload($event)"
+        chooseLabel="Select Resume"
+        uploadLabel="Upload"
+        cancelLabel="Cancel"
+        multiple="false"
+      >
+      </p-fileUpload>
+    </div>
+  </div>
+  

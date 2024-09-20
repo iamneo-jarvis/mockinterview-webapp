@@ -1,0 +1,13 @@
+<div class="video-call-container">
+    <input matInput [(ngModel)]="roomId" placeholder="Enter Room ID" style="height: 100%;"/>
+
+    <button mat-raised-button color="primary" style="height: 50px;" *ngIf="!inSession" (click)="getVideoSDKJWT()">Start Call</button> 
+    <div id="sessionContainer" class="video-section">
+        
+    </div>  
+    <div *ngIf="inSession" class="controls">
+        <button mat-fab color="warn" (click)="endCall()">
+          <mat-icon>call_end </mat-icon> End Call
+        </button>
+    </div>   
+</div>
